@@ -11,7 +11,7 @@ import {
 import axios from 'axios';
 import SidebarWithHeader from '../../components/SidebarWithHeader';
 
-const Dashboard = () => {
+const Home = () => {
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalTrainers: 0,
@@ -68,4 +68,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Home;

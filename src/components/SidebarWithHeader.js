@@ -1,41 +1,78 @@
 // src/components/SidebarWithHeader.js
+import React from 'react';
 import {
+  Box,
+  Flex,
   IconButton,
   Avatar,
-  Box,
-  CloseButton,
-  Flex,
   HStack,
   VStack,
-  Icon,
-  useColorModeValue,
   Text,
   Drawer,
   DrawerContent,
   useDisclosure,
+  CloseButton,
+  useColorModeValue,
+  Icon,
   Menu,
   MenuButton,
-  MenuDivider,
-  MenuItem,
   MenuList,
+  MenuItem,
+  MenuDivider,
 } from '@chakra-ui/react';
-import { FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings, FiMenu, FiBell, FiChevronDown, FiPlus } from 'react-icons/fi';
+import { FiMenu, FiBell, FiChevronDown, FiHome, FiPlus, FiSettings, FiBookOpen, FiUsers, FiClipboard } from 'react-icons/fi';
 import { Link as RouterLink } from 'react-router-dom';
 
-const role = localStorage.getItem('role');
-const LinkItems = [
-  { name: 'Home', icon: FiHome, path: '/' },
-  { name: 'Trending', icon: FiTrendingUp, path: '/trending' },
-  { name: 'Explore', icon: FiCompass, path: '/explore' },
-  { name: 'Favourites', icon: FiStar, path: '/favourites' },
-  { name: 'Settings', icon: FiSettings, path: '/settings' },
-];
+// Function to retrieve role from local storage
+const getUserRole = () => {
+  const user = JSON.parse(localStorage.getItem('user')); // Fetch 'user' object from localStorage
+  return user?.roles[0]; // Assuming the role is stored as an array and we're interested in the first role
+};
 
-if (role === 'ROLE_FORMATEUR') {
-  LinkItems.push({ name: 'Add Course', icon: FiPlus, path: '/add-course' });
-}
+// Function to define link items based on the role
+const getLinkItems = (role) => {
+  const commonItems = [
+    // Add common items here if needed
+  ];
+
+  switch (role) {
+    case 'ROLE_RESPONSABLE':
+      return [
+        ...commonItems,
+        { name: 'Manage Courses', icon: FiBookOpen, path: '/Course-Details' },
+        { name: 'Manage Students', icon: FiUsers, path: '/manage-students' },
+        { name: 'Manage Trainers', icon: FiUsers, path: '/manage-trainers' },
+        { name: 'Stats', icon: FiSettings, path: '/stats' },
+        { name: 'Home', icon: FiHome, path: '/home' },
+      ];
+    case 'ROLE_FORMATEUR':
+      return [
+        ...commonItems,
+        { name: 'Home', icon: FiHome, path: '/formateur-courses' },
+        { name: 'Add Course', icon: FiPlus, path: '/add-course' },
+        { name: 'View Courses', icon: FiBookOpen, path: '/courses' },
+        { name: 'Settings', icon: FiSettings, path: '/profile' },
+      ];
+    case 'ROLE_ETUDIANT':
+      return [
+        ...commonItems,
+        { name: 'View Courses', icon: FiBookOpen, path: '/view-courses' },
+        { name: 'My Registrations', icon: FiClipboard, path: '/my-registrations' },
+        { name: 'Settings', icon: FiSettings, path: '/settings' },
+      ];
+    default:
+      return commonItems;
+  }
+};
+const handleLogout = () => {
+  localStorage.removeItem('user'); // Clear the user data from local storage
+  window.location.href = '/user-selection'; // Redirect to UserSelection page
+};
 
 const SidebarContent = ({ onClose, ...rest }) => {
+  const role = getUserRole(); // Get the user's role from localStorage
+  const items = getLinkItems(role);
+
   return (
     <Box
       transition="3s ease"
@@ -53,14 +90,14 @@ const SidebarContent = ({ onClose, ...rest }) => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
+      {items.map((link) => (
         <NavItem key={link.name} icon={link.icon} path={link.path}>
           {link.name}
         </NavItem>
       ))}
     </Box>
   );
-}
+};
 
 const NavItem = ({ icon, children, path, ...rest }) => {
   return (
@@ -85,6 +122,27 @@ const NavItem = ({ icon, children, path, ...rest }) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }) => {
+  // Récupérer l'utilisateur depuis le localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
+  const username = user?.username || 'Guest'; // Si l'utilisateur n'est pas défini, afficher "Guest"
+  const role = user?.roles[0] || 'ROLE_UNKNOWN'; // Récupérer le rôle de l'utilisateur
+
+  // Définir le texte à afficher en fonction du rôle
+  let roleDisplay;
+  switch (role) {
+    case 'ROLE_RESPONSABLE':
+      roleDisplay = 'Responsable';
+      break;
+    case 'ROLE_FORMATEUR':
+      roleDisplay = 'Formateur';
+      break;
+    case 'ROLE_ETUDIANT':
+      roleDisplay = 'Etudiant';
+      break;
+    default:
+      roleDisplay = 'Unknown Role'; // Si le rôle n'est pas reconnu
+  }
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -115,8 +173,8 @@ const MobileNav = ({ onOpen, ...rest }) => {
               <HStack>
                 <Avatar size={'sm'} src={'https://example.com/your-avatar.jpg'} />
                 <VStack display={{ base: 'none', md: 'flex' }} alignItems="flex-start" spacing="1px" ml="2">
-                  <Text fontSize="sm">User Name</Text>
-                  <Text fontSize="xs" color="gray.600">Admin</Text>
+                  <Text fontSize="sm">{username}</Text> {/* Affiche le nom d'utilisateur */}
+                  <Text fontSize="xs" color="gray.600">{roleDisplay}</Text> {/* Affiche le rôle en fonction */}
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
@@ -124,24 +182,29 @@ const MobileNav = ({ onOpen, ...rest }) => {
               </HStack>
             </MenuButton>
             <MenuList bg={useColorModeValue('white', 'gray.900')} borderColor={useColorModeValue('gray.200', 'gray.700')}>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
+            <MenuItem as={RouterLink} to="/profile">Profile</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={() => {
+                localStorage.removeItem('user'); // Supprime l'utilisateur du stockage local
+                window.location.href = '/'; // Redirige vers la sélection de l'utilisateur après déconnexion
+              }}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
       </HStack>
     </Flex>
   );
-}
+};
 
-const SidebarWithHeader = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+
+
+
+const SidebarWithHeader = ({ children }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-      <SidebarContent onClose={() => onClose} display={{ base: 'none', md: 'block' }} />
+      <SidebarContent onClose={onClose} display={{ base: 'none', md: 'block' }} />
       <Drawer isOpen={isOpen} placement="left" onClose={onClose} returnFocusOnClose={false} onOverlayClick={onClose} size="full">
         <DrawerContent>
           <SidebarContent onClose={onClose} />
@@ -149,10 +212,10 @@ const SidebarWithHeader = () => {
       </Drawer>
       <MobileNav onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} p="4">
-        {/* Add your dashboard content here */}
+        {children} {/* This is where the page content will be rendered */}
       </Box>
     </Box>
-  )
-}
+  );
+};
 
 export default SidebarWithHeader;

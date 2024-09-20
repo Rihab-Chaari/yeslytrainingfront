@@ -33,9 +33,14 @@ const Login = () => {
       // Log the response to check what role is being returned
       console.log(response.data);
   
-      // Store token and role in local storage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('role', response.data.roles[0]); // Ensure roles[0] is correct based on response
+      // Store token and user data in local storage
+      localStorage.setItem('token', response.data.accessToken); // Adjust according to your API response
+      localStorage.setItem('user', JSON.stringify({
+        id: response.data.id,
+        username: response.data.username,
+        email: response.data.email,
+        roles: response.data.roles,
+      }));
   
       toast({
         title: 'Login successful.',
@@ -45,13 +50,14 @@ const Login = () => {
         isClosable: true,
       });
   
-      // Debug the role and perform redirection
-      if (response.data.roles[0] === 'ROLE_FORMATEUR') {
-        navigate('/dashboard/formateur');
-      } else if (response.data.roles[0] === 'ROLE_ETUDIANT') {
-        navigate('/dashboard/etudiant');
+      // Perform redirection based on role
+      const userRole = response.data.roles[0];
+      if (userRole === 'ROLE_FORMATEUR') {
+        navigate('/formateur-courses');
+      } else if (userRole === 'ROLE_ETUDIANT') {
+        navigate('/view-courses');
       } else {
-        navigate('/dashboard'); // fallback
+        navigate('/stats'); // fallback
       }
   
     } catch (error) {
