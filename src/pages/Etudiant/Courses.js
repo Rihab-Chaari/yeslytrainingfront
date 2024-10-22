@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
-import axios from 'axios'; // Assurez-vous que ce chemin est correct
+import axios from 'axios'; 
 import SidebarWithHeader from '../../components/SidebarWithHeader';
-import ItemCourse from '../Etudiant/ItemCourse';
+import ItemCourse from '../Etudiant/ItemCourse'; 
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]); // Assurez-vous que courses est un tableau vide par défaut
+  const [courses, setCourses] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [registeredCourses, setRegisteredCourses] = useState([]); 
 
+  // Fetching the courses and registered courses when the component loads
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -20,9 +22,8 @@ const Courses = () => {
         };
 
         const response = await axios.get('http://localhost:8081/api/cours', config);
-        console.log(response.data); // Vérifiez les données ici
+        console.log(response.data); 
 
-        // Assurez-vous que la réponse est un tableau
         if (Array.isArray(response.data)) {
           setCourses(response.data);
         } else {
@@ -35,8 +36,33 @@ const Courses = () => {
       }
     };
 
-    fetchCourses();
-  }, []); // Dépendances vides pour n'exécuter l'effet qu'une seule fois
+    const fetchRegisteredCourses = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user')); // Récupère l'utilisateur connecté depuis localStorage
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        // Fetches the list of courses the user has already registered for
+        const response = await axios.get(`http://localhost:8081/api/inscriptions/user/${user.id}`, config);
+        const registeredCourseIds = response.data.map(inscription => inscription.cours.id); // Extract course IDs
+        setRegisteredCourses(registeredCourseIds);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des cours inscrits:', error);
+      }
+    };
+
+    fetchCourses();  // Fetch all courses
+    fetchRegisteredCourses(); // Fetch registered courses
+  }, []); 
+
+  // Updates the registered courses state after a new course registration
+  const updateRegisteredCourses = (courseId) => {
+    setRegisteredCourses((prev) => [...prev, courseId]);
+  };
 
   if (loading) {
     return <Spinner />;
@@ -49,16 +75,21 @@ const Courses = () => {
   return (
     <SidebarWithHeader>
       <Box p={4}>
-        <Heading size="lg" mb={4}>Available Courses</Heading>
-        {courses.length === 0 ? (
-          <Text>No courses available.</Text>
-        ) : (
-          <VStack spacing={4}>
-            {courses.map(course => (
-              <ItemCourse key={course.id} course={course} />
-            ))}
-          </VStack>
-        )}
+        <Heading mb={6}>Available Courses</Heading>
+        <VStack spacing={4}>
+          {courses.length > 0 ? (
+            courses.map((course) => (
+              <ItemCourse
+                key={course.id}
+                course={course}
+                registeredCourses={registeredCourses} // Pass the registered courses to check if user is already registered
+                updateRegisteredCourses={updateRegisteredCourses} // Function to update after a successful registration
+              />
+            ))
+          ) : (
+            <Text>No courses available at the moment.</Text>
+          )}
+        </VStack>
       </Box>
     </SidebarWithHeader>
   );

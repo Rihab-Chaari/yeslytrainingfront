@@ -5,9 +5,10 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Stack,
   Heading,
   useToast,
+  Grid,
+  GridItem,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +23,8 @@ const SignupFormateur = () => {
     telephone: '',
     age: '',
     specialite: '',
-    role: ['formateur'] 
-  })
+    role: ['formateur'], 
+  });
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
@@ -40,8 +41,8 @@ const SignupFormateur = () => {
     try {
       await axios.post('http://localhost:8081/api/auth/signup', formData);
       toast({
-        title: 'Sign Up successful.',
-        description: 'You can now log in!',
+        title: 'Inscription réussie.',
+        description: 'Vous pouvez maintenant vous connecter !',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -49,8 +50,8 @@ const SignupFormateur = () => {
       navigate('/');
     } catch (error) {
       toast({
-        title: 'Sign Up failed.',
-        description: 'An error occurred. Please try again.',
+        title: 'Échec de l’inscription.',
+        description: 'Une erreur est survenue. Veuillez réessayer.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -61,54 +62,35 @@ const SignupFormateur = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md">
-      <Heading mb="6">Sign Up</Heading>
+    <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md" bg="white">
+      <Heading mb="6" color="teal.300">Inscription Formateur</Heading> {/* Couleur douce pour le titre */}
       <form onSubmit={handleSubmit}>
-        <Stack spacing="6">
-          <FormControl id="username" isRequired>
-            <FormLabel>Username</FormLabel>
-            <Input name="username" type="text" value={formData.username} onChange={handleChange} />
-          </FormControl>
+        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
+          {['username', 'email', 'password', 'nom', 'prenom', 'telephone', 'age', 'specialite'].map((field, index) => (
+            <GridItem key={index}>
+              <FormControl id={field} isRequired>
+                <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                <Input
+                  name={field}
+                  type={field === 'password' ? 'password' : field === 'age' ? 'number' : 'text'}
+                  value={formData[field]}
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </GridItem>
+          ))}
+        </Grid>
 
-          <FormControl id="email" isRequired>
-            <FormLabel>Email</FormLabel>
-            <Input name="email" type="email" value={formData.email} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="password" isRequired>
-            <FormLabel>Password</FormLabel>
-            <Input name="password" type="password" value={formData.password} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="nom" isRequired>
-            <FormLabel>Nom</FormLabel>
-            <Input name="nom" type="text" value={formData.nom} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="prenom" isRequired>
-            <FormLabel>Prénom</FormLabel>
-            <Input name="prenom" type="text" value={formData.prenom} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="telephone" isRequired>
-            <FormLabel>Téléphone</FormLabel>
-            <Input name="telephone" type="text" value={formData.telephone} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="age" isRequired>
-            <FormLabel>Age</FormLabel>
-            <Input name="age" type="number" value={formData.age} onChange={handleChange} />
-          </FormControl>
-
-          <FormControl id="specialite" isRequired>
-            <FormLabel>Spécialité</FormLabel>
-            <Input name="specialite" type="text" value={formData.specialite} onChange={handleChange} />
-          </FormControl>
-
-          <Button type="submit" colorScheme="teal" isLoading={isLoading}>
-            Sign Up
-          </Button>
-        </Stack>
+        <Button 
+          type="submit" 
+          colorScheme="teal" 
+          isLoading={isLoading} 
+          mt={6} 
+          bg="teal.400" 
+          _hover={{ bg: 'teal.500' }} // Couleur douce pour le bouton
+        >
+          S'inscrire
+        </Button>
       </form>
     </Box>
   );

@@ -23,33 +23,33 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       const response = await axios.post('http://localhost:8081/api/auth/signin', {
         username,
         password,
       });
-  
+
       // Log the response to check what role is being returned
       console.log(response.data);
-  
+
       // Store token and user data in local storage
-      localStorage.setItem('token', response.data.accessToken); // Adjust according to your API response
+      localStorage.setItem('token', response.data.accessToken);
       localStorage.setItem('user', JSON.stringify({
         id: response.data.id,
         username: response.data.username,
         email: response.data.email,
         roles: response.data.roles,
       }));
-  
+
       toast({
-        title: 'Login successful.',
-        description: 'Welcome back!',
+        title: 'Connexion réussie.',
+        description: 'Bienvenue de nouveau !',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-  
+
       // Perform redirection based on role
       const userRole = response.data.roles[0];
       if (userRole === 'ROLE_FORMATEUR') {
@@ -59,11 +59,11 @@ const Login = () => {
       } else {
         navigate('/stats'); // fallback
       }
-  
+
     } catch (error) {
       toast({
-        title: 'Login failed.',
-        description: 'Invalid credentials. Please try again.',
+        title: 'Échec de la connexion.',
+        description: 'Identifiants invalides. Veuillez réessayer.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -74,44 +74,52 @@ const Login = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md">
-      <Heading mb="6">Sign In</Heading>
+    <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md" bg="white">
+      <Heading mb="6" color="teal.300">Se connecter</Heading> {/* Couleur douce pour le titre */}
       <form onSubmit={handleSubmit}>
         <Stack spacing="6">
           <FormControl id="username" isRequired>
-            <FormLabel>Username</FormLabel>
+            <FormLabel>Nom d'utilisateur</FormLabel>
             <Input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder="Entrez votre nom d'utilisateur"
             />
           </FormControl>
           <FormControl id="password" isRequired>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>Mot de passe</FormLabel>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Entrez votre mot de passe"
             />
           </FormControl>
           <Button
             type="submit"
             colorScheme="teal"
             isLoading={isLoading}
-            loadingText="Signing in"
+            loadingText="Connexion..."
+            bg="teal.400" 
+            _hover={{ bg: 'teal.500' }} // Couleur douce pour le bouton
           >
-            Sign In
+            Se connecter
           </Button>
         </Stack>
       </form>
       <Text mt="4">
-        Don't have an account?{' '}
-        <Button variant="link" onClick={() => navigate('/signup')}>
-          Sign Up
-        </Button>
-      </Text>
+  Vous n'avez pas de compte ?
+</Text>
+<Stack spacing={2} mt={2}> {/* Espace entre les boutons */}
+  <Button variant="link" onClick={() => navigate('/signup/formateur')}>
+    S'inscrire Formateur
+  </Button>
+  <Button variant="link" onClick={() => navigate('/signup/etudiant')}>
+    S'inscrire Etudiant
+  </Button>
+</Stack>
+      
     </Box>
   );
 };

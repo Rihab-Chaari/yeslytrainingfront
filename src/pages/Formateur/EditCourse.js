@@ -12,10 +12,20 @@ const EditCourse = () => {
     dateDebut: '',
     dateFin: '',
     duree: '',
+    montant:'' ,
   });
   const toast = useToast();
   const navigate = useNavigate();
   const token = localStorage.getItem('token'); // Retrieve token from local storage
+
+  // Function to convert 'yyyy-MM-dd' for the input fields (as this is the format expected by Spring Boot)
+  const formatDateForInput = (dateStr) => {
+    if (!dateStr.includes('/')) {
+      return dateStr; // If the date is already in 'yyyy-MM-dd' format
+    }
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month}-${day}`; // Reformat to 'yyyy-MM-dd'
+  };
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -25,7 +35,15 @@ const EditCourse = () => {
             'Authorization': `Bearer ${token}`, // Include token in request header
           }
         });
-        setFormData(response.data);
+
+        // Use 'yyyy-MM-dd' format for the input fields
+        const formattedCourse = {
+          ...response.data,
+          dateDebut: formatDateForInput(response.data.dateDebut),
+          dateFin: formatDateForInput(response.data.dateFin),
+        };
+
+        setFormData(formattedCourse);
       } catch (error) {
         console.error('Error fetching course:', error.response);
         toast({
@@ -48,6 +66,7 @@ const EditCourse = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
       await axios.put(`http://localhost:8081/api/cours/${id}`, formData, {
         headers: {
@@ -72,64 +91,71 @@ const EditCourse = () => {
       });
     }
   };
-
+  
   return (
-<SidebarWithHeader>
-    <Box p="6">
-      <form onSubmit={handleSubmit}>
-        <Stack spacing="6">
-          <FormControl id="titre" isRequired>
-            <FormLabel>Title</FormLabel>
-            <Input
-              name="titre"
-              value={formData.titre}
-              onChange={handleChange}
-              placeholder="Enter course title"
-            />
-          </FormControl>
-          <FormControl id="description" isRequired>
-            <FormLabel>Description</FormLabel>
-            <Input
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter course description"
-            />
-          </FormControl>
-          <FormControl id="dateDebut" isRequired>
-            <FormLabel>Start Date</FormLabel>
-            <Input
-              name="dateDebut"
-              type='date'
-              value={formData.dateDebut}
-              onChange={handleChange}
-              placeholder="Enter start date"
-            />
-          </FormControl>
-          <FormControl id="dateFin" isRequired>
-            <FormLabel>End Date</FormLabel>
-            <Input
-              name="dateFin"
-              type='date'
-              value={formData.dateFin}
-              onChange={handleChange}
-              placeholder="Enter end date"
-            />
-          </FormControl>
-          <FormControl id="duree" isRequired>
-            <FormLabel>Duration (hours)</FormLabel>
-            <Input
-              name="duree"
-              type="number"
-              value={formData.duree}
-              onChange={handleChange}
-            />
-          </FormControl>
-          <Button type="submit" colorScheme="teal">Update Course</Button>
-        </Stack>
-      </form>
-    </Box>
-</SidebarWithHeader>
+    <SidebarWithHeader>
+      <Box p="6">
+        <form onSubmit={handleSubmit}>
+          <Stack spacing="6">
+            <FormControl id="titre" isRequired>
+              <FormLabel>Title</FormLabel>
+              <Input
+                name="titre"
+                value={formData.titre}
+                onChange={handleChange}
+                placeholder="Enter course title"
+              />
+            </FormControl>
+            <FormControl id="description" isRequired>
+              <FormLabel>Description</FormLabel>
+              <Input
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter course description"
+              />
+            </FormControl>
+            <FormControl id="dateDebut" isRequired>
+              <FormLabel>Start Date</FormLabel>
+              <Input
+                name="dateDebut"
+                type="date"
+                value={formData.dateDebut}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl id="dateFin" isRequired>
+              <FormLabel>End Date</FormLabel>
+              <Input
+                name="dateFin"
+                type="date"
+                value={formData.dateFin}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl id="duree" isRequired>
+              <FormLabel>Duration (hours)</FormLabel>
+              <Input
+                name="duree"
+                type="number"
+                value={formData.duree}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl id="montant" isRequired>
+              <FormLabel>Montant (DT)</FormLabel>
+              <Input
+                name="montant"
+                type="number"
+                value={formData.montant}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <Button type="submit" colorScheme="teal">Update Course</Button>
+          </Stack>
+        </form>
+      </Box>
+    </SidebarWithHeader>
   );
 };
 

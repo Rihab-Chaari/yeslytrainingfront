@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SidebarWithHeader from '../../../src/components/SidebarWithHeader';
 
-const Students = () => {
+const Trainers = () => {
   const [students, setStudents] = useState([]);
   const toast = useToast();
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get('http://localhost:8081/api/auth/students', {
+        const response = await axios.get('http://localhost:8081/api/auth/trainers', {
           headers: {
             Authorization: `Bearer ${token}`,
           }
@@ -22,7 +22,7 @@ const Students = () => {
         console.log(response.data);
         setStudents(response.data);
       } catch (error) {
-        console.error('Error fetching students:', error.response);
+        console.error('Error fetching trainings:', error.response);
         toast({
           title: 'Failed to load students.',
           description: error.message,
@@ -42,7 +42,7 @@ const Students = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8081/api/auth/students/${id}`, {
+      await axios.delete(`http://localhost:8081/api/auth/trainer/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -69,7 +69,7 @@ const Students = () => {
   return (
     <SidebarWithHeader>
       <Box p={8} bg="gray.50" minH="100vh">
-        <Heading mb={6} color="#DE3163" textAlign="center">Student List</Heading>
+        <Heading mb={6} color="#DE3163" textAlign="center">trainers List</Heading>
         <Stack spacing={6}>
           {students.length > 0 ? (
             students.map(student => (
@@ -121,4 +121,4 @@ const Students = () => {
   );
 };
 
-export default Students;
+export default Trainers;

@@ -19,14 +19,23 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  Image
 } from '@chakra-ui/react';
 import { FiMenu, FiBell, FiChevronDown, FiHome, FiPlus, FiSettings, FiBookOpen, FiUsers, FiClipboard } from 'react-icons/fi';
 import { Link as RouterLink } from 'react-router-dom';
 
+const getUser = () => {
+  return JSON.parse(localStorage.getItem('user')); // Fetch 'user' object from localStorage
+};
 // Function to retrieve role from local storage
 const getUserRole = () => {
   const user = JSON.parse(localStorage.getItem('user')); // Fetch 'user' object from localStorage
   return user?.roles[0]; // Assuming the role is stored as an array and we're interested in the first role
+};
+
+const getEtudiantId = () => {
+  const user = getUser(); // Fetch user data
+  return user?.id; // Assuming the user object has an 'id' property
 };
 
 // Function to define link items based on the role
@@ -39,11 +48,10 @@ const getLinkItems = (role) => {
     case 'ROLE_RESPONSABLE':
       return [
         ...commonItems,
-        { name: 'Manage Courses', icon: FiBookOpen, path: '/Course-Details' },
-        { name: 'Manage Students', icon: FiUsers, path: '/manage-students' },
-        { name: 'Manage Trainers', icon: FiUsers, path: '/manage-trainers' },
+        { name: 'Course Details', icon: FiBookOpen, path: '/Course-Details' },
+        { name: 'List Of Students', icon: FiUsers, path: '/students' },
+        { name: 'List Of Trainers', icon: FiUsers, path: '/trainers' },
         { name: 'Stats', icon: FiSettings, path: '/stats' },
-        { name: 'Home', icon: FiHome, path: '/home' },
       ];
     case 'ROLE_FORMATEUR':
       return [
@@ -51,14 +59,15 @@ const getLinkItems = (role) => {
         { name: 'Home', icon: FiHome, path: '/formateur-courses' },
         { name: 'Add Course', icon: FiPlus, path: '/add-course' },
         { name: 'View Courses', icon: FiBookOpen, path: '/courses' },
-        { name: 'Settings', icon: FiSettings, path: '/profile' },
+      
       ];
     case 'ROLE_ETUDIANT':
       return [
         ...commonItems,
         { name: 'View Courses', icon: FiBookOpen, path: '/view-courses' },
         { name: 'My Registrations', icon: FiClipboard, path: '/my-registrations' },
-        { name: 'Settings', icon: FiSettings, path: '/settings' },
+        { name: 'Télécharger mes reçus', icon: FiClipboard, path: `/receipts/${getEtudiantId()}` },
+       
       ];
     default:
       return commonItems;
@@ -162,9 +171,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-      <Text display={{ base: 'flex', md: 'none' }} fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-        Logo
-      </Text>
+     <Text display={{ base: 'flex', md: 'none' }} fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+       <Image src="/logo.jpg" alt="Logo" boxSize="50px" objectFit="cover" />
+     </Text>
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
         <Flex alignItems={'center'}>

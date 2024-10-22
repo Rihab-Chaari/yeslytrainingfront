@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from 'react'; 
-import { Box, Button, FormControl, FormLabel, Input, Stack, useToast } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Button, FormControl, FormLabel, Input, Stack, useToast, Spinner } from '@chakra-ui/react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SidebarWithHeader from '../../../src/components/SidebarWithHeader';
 
 const AddCoursForm = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // Retrieve user data from local storage
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const formateurId = storedUser ? storedUser.id : null;
-  const token = localStorage.getItem('token'); // Retrieve token from local storage
-
-  useEffect(() => {
-    console.log("Formateur ID:", formateurId); // Check if it's retrieved properly
-  }, [formateurId]);
+  const token = localStorage.getItem('token');
 
   const [formData, setFormData] = useState({
     titre: '',
@@ -23,38 +18,59 @@ const AddCoursForm = () => {
     dateDebut: '',
     dateFin: '',
     duree: '',
+    montant: 0,
     formateur: { id: formateurId },
   });
+
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`; // Format: dd/MM/yyyy
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    console.log('Token:', token); // Check if token is properly retrieved
+    setIsLoading(true); 
 
-    // Format dates before sending
+    // Validate if formateurId exists
+    if (!formateurId) {
+      toast({
+        title: 'Error',
+        description: 'Formateur ID is missing. Please log in again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate dates
+    if (new Date(formData.dateDebut) >= new Date(formData.dateFin)) {
+      toast({
+        title: 'Invalid date range.',
+        description: 'End date must be after start date.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+
     const formattedData = {
       ...formData,
-      dateDebut: formatDate(formData.dateDebut),
-      dateFin: formatDate(formData.dateFin),
+      formateur: { id: formateurId },  // Include the formateur with its ID
+      dateDebut: formData.dateDebut,
+      dateFin: formData.dateFin,
     };
 
     try {
       await axios.post('http://localhost:8081/api/cours', formattedData, {
         headers: {
-          'Authorization': `Bearer ${token}`, // Include token in request header
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         }
       });
       toast({
@@ -63,18 +79,30 @@ const AddCoursForm = () => {
         duration: 3000,
         isClosable: true,
       });
+      setFormData({
+        titre: '',
+        description: '',
+        dateDebut: '',
+        dateFin: '',
+        duree: '',
+        montant: 0,
+        formateur: { id: 3},
+      });
       navigate('/courses');
     } catch (error) {
-      console.error('Error response:', error.response); // Log error response
+      console.error('Error response:', error.response);
       toast({
         title: 'Failed to add course.',
-        description: error.message,
+        description: error.response?.data?.message || 'An error occurred. Please try again.',
         status: 'error',
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsLoading(false); 
     }
   };
+
 
   return (
     <SidebarWithHeader>
@@ -103,7 +131,7 @@ const AddCoursForm = () => {
               <FormLabel>Start Date</FormLabel>
               <Input
                 name="dateDebut"
-                type='date'
+                type="date"
                 value={formData.dateDebut}
                 onChange={handleChange}
                 placeholder="Enter start date"
@@ -113,7 +141,7 @@ const AddCoursForm = () => {
               <FormLabel>End Date</FormLabel>
               <Input
                 name="dateFin"
-                type='date'
+                type="date"
                 value={formData.dateFin}
                 onChange={handleChange}
                 placeholder="Enter end date"
@@ -128,9 +156,19 @@ const AddCoursForm = () => {
                 onChange={handleChange}
               />
             </FormControl>
-            <Button type="submit" colorScheme="teal">Add Course</Button>
+            <FormControl id="montant" isRequired>
+              <FormLabel>Montant (DT)</FormLabel>
+              <Input
+                name="montant"
+                type="number"
+                value={formData.montant}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <Button type="submit" colorScheme="teal" isLoading={isLoading}>
+              {isLoading ? <Spinner size="sm" /> : 'Add Course'}
+            </Button>
           </Stack>
-         
         </form>
       </Box>
     </SidebarWithHeader>
