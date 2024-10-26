@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Stack, useToast, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Stack,
+  useToast,
+  Spinner,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SidebarWithHeader from '../../../src/components/SidebarWithHeader';
@@ -22,7 +31,7 @@ const AddCoursForm = () => {
     formateur: { id: formateurId },
   });
 
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false); // État de chargement
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,9 +40,9 @@ const AddCoursForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); 
+    setIsLoading(true);
 
-    // Validate if formateurId exists
+    // Validation si formateurId existe
     if (!formateurId) {
       toast({
         title: 'Error',
@@ -46,7 +55,7 @@ const AddCoursForm = () => {
       return;
     }
 
-    // Validate dates
+    // Validation des dates
     if (new Date(formData.dateDebut) >= new Date(formData.dateFin)) {
       toast({
         title: 'Invalid date range.',
@@ -61,17 +70,15 @@ const AddCoursForm = () => {
 
     const formattedData = {
       ...formData,
-      formateur: { id: formateurId },  // Include the formateur with its ID
-      dateDebut: formData.dateDebut,
-      dateFin: formData.dateFin,
+      formateur: { id: formateurId }, // Inclure le formateur avec son ID
     };
 
     try {
       await axios.post('http://localhost:8081/api/cours', formattedData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        }
+        },
       });
       toast({
         title: 'Course added successfully.',
@@ -86,7 +93,7 @@ const AddCoursForm = () => {
         dateFin: '',
         duree: '',
         montant: 0,
-        formateur: { id: 3},
+        formateur: { id: 3 },
       });
       navigate('/courses');
     } catch (error) {
@@ -99,10 +106,9 @@ const AddCoursForm = () => {
         isClosable: true,
       });
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
-
 
   return (
     <SidebarWithHeader>
@@ -110,7 +116,7 @@ const AddCoursForm = () => {
         <form onSubmit={handleSubmit}>
           <Stack spacing="6">
             <FormControl id="titre" isRequired>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>Titre</FormLabel>
               <Input
                 name="titre"
                 value={formData.titre}
@@ -128,7 +134,7 @@ const AddCoursForm = () => {
               />
             </FormControl>
             <FormControl id="dateDebut" isRequired>
-              <FormLabel>Start Date</FormLabel>
+              <FormLabel>date de début</FormLabel>
               <Input
                 name="dateDebut"
                 type="date"
@@ -138,7 +144,7 @@ const AddCoursForm = () => {
               />
             </FormControl>
             <FormControl id="dateFin" isRequired>
-              <FormLabel>End Date</FormLabel>
+              <FormLabel>date de fin</FormLabel>
               <Input
                 name="dateFin"
                 type="date"
@@ -148,7 +154,7 @@ const AddCoursForm = () => {
               />
             </FormControl>
             <FormControl id="duree" isRequired>
-              <FormLabel>Duration (hours)</FormLabel>
+              <FormLabel>Durée (heures)</FormLabel>
               <Input
                 name="duree"
                 type="number"
@@ -165,7 +171,13 @@ const AddCoursForm = () => {
                 onChange={handleChange}
               />
             </FormControl>
-            <Button type="submit" colorScheme="teal" isLoading={isLoading}>
+            <Button
+              type="submit"
+              bg="#d32c81" // Couleur personnalisée
+              color="white" // Couleur du texte
+              _hover={{ bg: '#c82a76' }} // Couleur de survol
+              isLoading={isLoading}
+            >
               {isLoading ? <Spinner size="sm" /> : 'Add Course'}
             </Button>
           </Stack>

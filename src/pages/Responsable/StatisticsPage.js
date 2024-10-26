@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Box, Heading, VStack, Spinner, Alert, AlertIcon, Text, Icon, SimpleGrid, useColorModeValue 
+import {
+  Box,
+  Heading,
+  Spinner,
+  Alert,
+  AlertIcon,
+  Text,
+  Icon,
+  VStack,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { FaUser, FaChalkboardTeacher, FaBook, FaUserCheck } from 'react-icons/fa';
 import SidebarWithHeader from '../../components/SidebarWithHeader';
@@ -41,8 +49,10 @@ const StatisticsPage = () => {
     fetchStats();
   }, [token]);
 
-  const boxBg = useColorModeValue('white', 'gray.800'); // Background color for light/dark mode
-  const boxShadow = useColorModeValue('lg', 'dark-lg'); // Shadow effect
+  const bgColor = useColorModeValue('white', 'gray.800'); // Background color for light/dark mode
+  const textColor = useColorModeValue('gray.700', 'whiteAlpha.900'); // Text color
+  const headingColor = "#DE3163"; // Main heading color
+  const accentColors = ['#FFB74D', '#4CAF50', '#00BCD4']; // Accent colors for the cards
 
   if (loading) {
     return <Spinner size="xl" />;
@@ -59,53 +69,73 @@ const StatisticsPage = () => {
 
   return (
     <SidebarWithHeader>
-      <Box p={8}>
-        <Heading mb={6} textAlign="center" color="#DE3163">
+      <Box p={8} bg={bgColor} borderRadius="md" boxShadow="lg">
+        <Heading mb={8} textAlign="center" color={headingColor}>
           Statistiques du Centre de Formation
         </Heading>
-        <SimpleGrid columns={[1, null, 2]} spacing={8}>
+        
+        <VStack spacing={6} align="stretch"> {/* Utilisation de VStack pour empiler les cartes */}
           {/* Etudiants */}
-          <Box p={6} borderWidth={1} borderRadius="lg" bg={boxBg} boxShadow={boxShadow} _hover={{ transform: 'scale(1.05)', transition: '0.3s' }}>
-            <Text fontSize="lg" mb={2} fontWeight="bold" color="teal.500">
-              <Icon as={FaUser} mr={2} /> Nombre d'étudiants inscrits
-            </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" color="gray.700">
-              {stats?.totalStudents || '0'}
-            </Text>
-          </Box>
-
+          <StatisticCard
+            icon={FaUser}
+            title="Nombre d'étudiants inscrits"
+            value={stats?.totalStudents || '0'}
+            bgColor={accentColors[0]}
+            textColor={textColor}
+          />
+          
           {/* Formateurs */}
-          <Box p={6} borderWidth={1} borderRadius="lg" bg={boxBg} boxShadow={boxShadow} _hover={{ transform: 'scale(1.05)', transition: '0.3s' }}>
-            <Text fontSize="lg" mb={2} fontWeight="bold" color="teal.500">
-              <Icon as={FaChalkboardTeacher} mr={2} /> Nombre de formateurs
-            </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" color="gray.700">
-              {stats?.totalTrainers || '0'}
-            </Text>
-          </Box>
-
+          <StatisticCard
+            icon={FaChalkboardTeacher}
+            title="Nombre de formateurs"
+            value={stats?.totalTrainers || '0'}
+            bgColor={accentColors[1]}
+            textColor={textColor}
+          />
+          
           {/* Cours */}
-          <Box p={6} borderWidth={1} borderRadius="lg" bg={boxBg} boxShadow={boxShadow} _hover={{ transform: 'scale(1.05)', transition: '0.3s' }}>
-            <Text fontSize="lg" mb={2} fontWeight="bold" color="teal.500">
-              <Icon as={FaBook} mr={2} /> Nombre de cours
-            </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" color="gray.700">
-              {stats?.totalCourses || '0'}
-            </Text>
-          </Box>
-
+          <StatisticCard
+            icon={FaBook}
+            title="Nombre de cours"
+            value={stats?.totalCourses || '0'}
+            bgColor={accentColors[2]}
+            textColor={textColor}
+          />
+          
           {/* Inscriptions */}
-          <Box p={6} borderWidth={1} borderRadius="lg" bg={boxBg} boxShadow={boxShadow} _hover={{ transform: 'scale(1.05)', transition: '0.3s' }}>
-            <Text fontSize="lg" mb={2} fontWeight="bold" color="teal.500">
-              <Icon as={FaUserCheck} mr={2} /> Total des inscriptions
-            </Text>
-            <Text fontSize="3xl" fontWeight="extrabold" color="gray.700">
-              {stats?.totalRegistrations || '0'}
-            </Text>
-          </Box>
-        </SimpleGrid>
+          <StatisticCard
+            icon={FaUserCheck}
+            title="Total des inscriptions"
+            value={stats?.totalRegistrations || '0'}
+            bgColor={headingColor}
+            textColor="white"
+          />
+        </VStack>
       </Box>
     </SidebarWithHeader>
+  );
+};
+
+const StatisticCard = ({ icon, title, value, bgColor, textColor }) => {
+  return (
+    <Box
+      p={6}
+      borderRadius="lg"
+      bg={bgColor}
+      color={textColor}
+      boxShadow="md"
+      transition="0.3s"
+      _hover={{ transform: 'translateY(-5px)', boxShadow: 'lg' }}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+    >
+      <Icon as={icon} boxSize={10} mb={4} />
+      <Text fontSize="lg" fontWeight="bold">{title}</Text>
+      <Text fontSize="3xl" fontWeight="extrabold" mt={2}>{value}</Text>
+    </Box>
   );
 };
 

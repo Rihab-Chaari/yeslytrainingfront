@@ -75,7 +75,7 @@ const Login = () => {
 
   return (
     <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md" bg="white">
-      <Heading mb="6" color="teal.300">Se connecter</Heading> {/* Couleur douce pour le titre */}
+      <Heading mb="6" color="#383587">Se connecter</Heading> {/* Couleur pour le titre */}
       <form onSubmit={handleSubmit}>
         <Stack spacing="6">
           <FormControl id="username" isRequired>
@@ -85,6 +85,8 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Entrez votre nom d'utilisateur"
+              borderColor="#ef8566" // Couleur de la bordure
+              _focus={{ borderColor: '#d32c81' }} // Couleur lors du focus
             />
           </FormControl>
           <FormControl id="password" isRequired>
@@ -94,6 +96,8 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Entrez votre mot de passe"
+              borderColor="#ef8566" // Couleur de la bordure
+              _focus={{ borderColor: '#d32c81' }} // Couleur lors du focus
             />
           </FormControl>
           <Button
@@ -101,25 +105,25 @@ const Login = () => {
             colorScheme="teal"
             isLoading={isLoading}
             loadingText="Connexion..."
-            bg="teal.400" 
-            _hover={{ bg: 'teal.500' }} // Couleur douce pour le bouton
+            bg="#ef8566" // Couleur du bouton
+            color="white"
+            _hover={{ bg: '#d32c81' }} // Couleur lors du survol
           >
             Se connecter
           </Button>
         </Stack>
       </form>
-      <Text mt="4">
-  Vous n'avez pas de compte ?
-</Text>
-<Stack spacing={2} mt={2}> {/* Espace entre les boutons */}
-  <Button variant="link" onClick={() => navigate('/signup/formateur')}>
-    S'inscrire Formateur
-  </Button>
-  <Button variant="link" onClick={() => navigate('/signup/etudiant')}>
-    S'inscrire Etudiant
-  </Button>
-</Stack>
-      
+      <Text mt="4" color="#383587">
+        Vous n'avez pas de compte ?
+      </Text>
+      <Stack spacing={2} mt={2}> {/* Espace entre les boutons */}
+        <Button variant="link" color="#383587" onClick={() => navigate('/signup/formateur')}>
+          S'inscrire Formateur
+        </Button>
+        <Button variant="link" color="#383587" onClick={() => navigate('/signup/etudiant')}>
+          S'inscrire Étudiant
+        </Button>
+      </Stack>
     </Box>
   );
 };

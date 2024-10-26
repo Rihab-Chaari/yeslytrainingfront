@@ -66,6 +66,7 @@ const getLinkItems = (role) => {
         ...commonItems,
         { name: 'View Courses', icon: FiBookOpen, path: '/view-courses' },
         { name: 'My Registrations', icon: FiClipboard, path: '/my-registrations' },
+        {name: 'Recommendations', icon: FiClipboard, path: '/recommendations' },
         { name: 'Télécharger mes reçus', icon: FiClipboard, path: `/receipts/${getEtudiantId()}` },
        
       ];
@@ -95,7 +96,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+        <Image src="/logo1.png" alt="Logo" mb={4} boxSize="175px" mx="auto" />
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>

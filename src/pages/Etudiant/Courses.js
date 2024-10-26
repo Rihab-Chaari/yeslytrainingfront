@@ -59,6 +59,14 @@ const Courses = () => {
     fetchRegisteredCourses(); // Fetch registered courses
   }, []); 
 
+  // Filtrer les cours pour exclure ceux dont la date de fin est passée
+  const today = new Date(); // Date actuelle
+
+  const filteredCourses = courses.filter((course) => {
+    const dateFin = new Date(course.dateFin); // Convertir la date de fin en objet Date
+    return dateFin >= today; // Retourner seulement les cours qui n'ont pas encore expiré
+  });
+
   // Updates the registered courses state after a new course registration
   const updateRegisteredCourses = (courseId) => {
     setRegisteredCourses((prev) => [...prev, courseId]);
@@ -77,8 +85,8 @@ const Courses = () => {
       <Box p={4}>
         <Heading mb={6}>Available Courses</Heading>
         <VStack spacing={4}>
-          {courses.length > 0 ? (
-            courses.map((course) => (
+          {filteredCourses.length > 0 ? (
+            filteredCourses.map((course) => (
               <ItemCourse
                 key={course.id}
                 course={course}
@@ -87,7 +95,7 @@ const Courses = () => {
               />
             ))
           ) : (
-            <Text>No courses available at the moment.</Text>
+            <Text>No active courses available at the moment.</Text>
           )}
         </VStack>
       </Box>

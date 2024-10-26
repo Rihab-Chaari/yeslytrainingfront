@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Stack, Text, Heading, VStack, HStack, Divider, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Stack,
+  Text,
+  Heading,
+  VStack,
+  HStack,
+  Divider,
+  useToast,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SidebarWithHeader from '../../../src/components/SidebarWithHeader';
@@ -14,11 +24,14 @@ const CourseList = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/api/cours/formateur/${formateurId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include token in request header
+        const response = await axios.get(
+          `http://localhost:8081/api/cours/formateur/${formateurId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in request header
+            },
           }
-        });
+        );
         setCourses(response.data);
       } catch (error) {
         console.error('Error fetching courses:', error.response);
@@ -44,9 +57,9 @@ const CourseList = () => {
       await axios.delete(`http://localhost:8081/api/cours/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Include token in request header
-        }
+        },
       });
-      setCourses(courses.filter(course => course.id !== id));
+      setCourses(courses.filter((course) => course.id !== id));
       toast({
         title: 'Course deleted successfully.',
         status: 'success',
@@ -68,32 +81,53 @@ const CourseList = () => {
   return (
     <SidebarWithHeader>
       <Box p={8} bg="gray.50" minH="100vh">
-        <Heading mb={6} color="#DE3163" textAlign="center">Course List</Heading>
+        <Heading mb={6} color="#383587" textAlign="center">
+          Liste Des Cours
+        </Heading>
         <Stack spacing={6}>
           {courses.length > 0 ? (
-            courses.map(course => (
+            courses.map((course) => (
               <Box
                 key={course.id}
                 borderWidth="1px"
                 borderRadius="lg"
                 p={6}
-                bg='gray.100'
+                bg="white" // Changed to white for better contrast
                 boxShadow="lg"
                 transition="transform 0.2s ease-in-out"
-                _hover={{ transform: 'scale(1.02)' }}
+                _hover={{ transform: 'scale(1.02)', boxShadow: 'xl' }} // Added box shadow on hover
               >
                 <VStack align="start" spacing={4}>
-                  <Heading size="md" color="#DE3163" fontWeight="bold">{course.titre}</Heading>
-                  <Text fontWeight="bold">Description: <Text mt={2} fontSize="md" color="gray.600">{course.description}</Text></Text>
-                  <Text fontWeight="bold">Start Date: <Text as="span" color="gray.600">{course.dateDebut}</Text></Text>
-                  <Text fontWeight="bold">End Date: <Text as="span" color="gray.600">{course.dateFin}</Text></Text>
-                  <Text fontWeight="bold">Duration: <Text as="span" color="gray.600">{course.duree} hours</Text></Text>
-                  <Text fontWeight="bold">Montant: <Text as="span" color="gray.600">{course.montant} DT</Text></Text>
+                  <Heading size="md" color="#d32c81" fontWeight="bold">
+                    {course.titre}
+                  </Heading>
+                  <Text fontWeight="bold">
+                    Description:
+                    <Text mt={2} fontSize="md" color="gray.600">
+                      {course.description}
+                    </Text>
+                  </Text>
+                  <Text fontWeight="bold">
+                  date de début:
+                    <Text as="span" color="gray.600">{course.dateDebut}</Text>
+                  </Text>
+                  <Text fontWeight="bold">
+                  date de fin:
+                    <Text as="span" color="gray.600">{course.dateFin}</Text>
+                  </Text>
+                  <Text fontWeight="bold">
+                  Durée:
+                    <Text as="span" color="gray.600">{course.duree} hours</Text>
+                  </Text>
+                  <Text fontWeight="bold">
+                    Montant:
+                    <Text as="span" color="gray.600">{course.montant} DT</Text>
+                  </Text>
                   <Divider my={4} />
                   <HStack spacing={6}>
                     <Button
                       onClick={() => handleEdit(course.id)}
-                      colorScheme="#DE3163"
+                      colorScheme="pink" // Changed to pink to match #DE3163
                       variant="outline"
                       size="sm"
                     >
@@ -112,7 +146,9 @@ const CourseList = () => {
               </Box>
             ))
           ) : (
-            <Text fontStyle="italic" color="gray.500">No courses available.</Text>
+            <Text fontStyle="italic" color="gray.500">
+              No courses available.
+            </Text>
           )}
         </Stack>
       </Box>

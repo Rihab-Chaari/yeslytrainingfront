@@ -9,6 +9,9 @@ import {
   useToast,
   Grid,
   GridItem,
+  Text,
+  VStack,
+  Divider,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -62,19 +65,47 @@ const SignupEtudiant = () => {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt="10" p="6" boxShadow="lg" borderRadius="md" bg="white">
-      <Heading mb="6" color="teal.300">Inscription Étudiant</Heading> {/* Couleur douce pour le titre */}
+    <Box 
+      maxW="lg" 
+      mx="auto" 
+      mt={12} 
+      p={8} 
+      boxShadow="2xl" 
+      borderRadius="xl" 
+      bg="white" 
+      border="1px solid" 
+      borderColor="#383587" 
+      _hover={{ boxShadow: "lg" }}
+      backdropFilter="blur(8px)"
+    >
+      <VStack spacing={6} align="start">
+        <Heading fontSize="2xl" color="#383587" textAlign="center" w="full">
+          Inscription Étudiant
+        </Heading>
+        <Text color="#d32c81" fontSize="sm">
+          Veuillez remplir le formulaire ci-dessous pour créer votre compte étudiant.
+        </Text>
+      </VStack>
+
+      <Divider my={4} borderColor="#ef8566" />
+
       <form onSubmit={handleSubmit}>
-        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
+        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6} mb={4}>
           {['username', 'email', 'password', 'nom', 'prenom', 'telephone', 'age', 'specialite'].map((field, index) => (
             <GridItem key={index}>
               <FormControl id={field} isRequired>
-                <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                <FormLabel fontSize="sm" fontWeight="bold" color="#383587">
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </FormLabel>
                 <Input
                   name={field}
                   type={field === 'password' ? 'password' : field === 'age' ? 'number' : 'text'}
                   value={formData[field]}
                   onChange={handleChange}
+                  variant="filled"
+                  bg="#f9f9fc"
+                  _hover={{ bg: "#ef8566" }}
+                  _focus={{ borderColor: '#d32c81', bg: 'white' }}
                 />
               </FormControl>
             </GridItem>
@@ -83,11 +114,15 @@ const SignupEtudiant = () => {
 
         <Button 
           type="submit" 
-          colorScheme="teal" 
           isLoading={isLoading} 
-          mt={6} 
-          bg="teal.400" 
-          _hover={{ bg: 'teal.500' }} // Couleur douce pour le bouton
+          w="full" 
+          mt={4} 
+          size="lg" 
+          bg="#d32c81" 
+          color="white"
+          _hover={{ bg: '#ef8566', transform: 'scale(1.05)' }}
+          _active={{ bg: '#383587' }}
+          transition="all 0.2s"
         >
           S'inscrire
         </Button>

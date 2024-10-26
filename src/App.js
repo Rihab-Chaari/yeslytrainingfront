@@ -22,6 +22,7 @@ import PaymentForm from './components/PaymentForm';
 import ReceiptDownload from './pages/Etudiant/ReceiptDownload';
 import Trainers from './pages/Responsable/Trainers';
 import Cours from './pages/Responsable/Cours'
+import RecommendationsPage from './pages/Etudiant/RecommendationsPage';
 function App() {
   return (
     <Router>
@@ -46,6 +47,7 @@ function App() {
         <Route path="/my-registrations" element={<MyRegistrations />} />
         <Route path="/payment-form" element={<PaymentForm />} />
         <Route path="/receipts/:id" element={<ReceiptDownload />} />
+        <Route path="/recommendations" element={<RecommendationsPage />} />
    
       </Routes>
     </Router>
